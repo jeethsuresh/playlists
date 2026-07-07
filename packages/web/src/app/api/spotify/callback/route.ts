@@ -3,6 +3,7 @@ import { users } from "@playlists/db";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { ensureDbReady, getDb } from "@/lib/db";
+import { publicAppUrl } from "@/lib/public-url";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  const redirectUri = `${process.env.NEXTAUTH_URL}/api/spotify/callback`;
+  const redirectUri = `${publicAppUrl()}/api/spotify/callback`;
 
   if (!clientId || !clientSecret) {
     return NextResponse.redirect(new URL("/settings?spotify=error", request.url));

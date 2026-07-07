@@ -43,9 +43,11 @@ export WS_HOST_PORT="$((HOST_PORT + 1))"
 export POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT}"
 export_compose_runtime_env
 
-if [[ "${PROJECT_NAME}" == *"-staging" ]]; then
-  export NEXTAUTH_URL="http://127.0.0.1:${HOST_PORT}"
+# Auth middleware uses NEXTAUTH_URL as the request base; Forge health checks probe 127.0.0.1.
+if [[ -z "${NEXTAUTH_PUBLIC_URL:-}" && -n "${NEXTAUTH_URL:-}" ]]; then
+  export NEXTAUTH_PUBLIC_URL="${NEXTAUTH_URL}"
 fi
+export NEXTAUTH_URL="http://127.0.0.1:${HOST_PORT}"
 
 ENV_FILE="${SCRIPT_DIR}/.env"
 ENV_EXAMPLE="${SCRIPT_DIR}/.env.example"

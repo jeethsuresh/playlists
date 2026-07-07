@@ -43,5 +43,6 @@ export_compose_runtime_env() {
   export COMPOSE_PROJECT_NAME="${PROJECT_NAME}"
   local tag="${DEPLOY_IMAGE_TAG:-latest}"
   export APP_IMAGE="playlists-app:${tag}"
-  export WS_IMAGE="playlists-ws:${tag}"
+  # Forge only tags app images (next/stable/rollback); ws always comes from the latest build.
+  export WS_IMAGE="playlists-ws:latest"
 }

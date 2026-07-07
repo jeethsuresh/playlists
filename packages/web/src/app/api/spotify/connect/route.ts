@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { publicAppUrl } from "@/lib/public-url";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -8,7 +9,7 @@ export async function GET(request: Request) {
   }
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const redirectUri = `${process.env.NEXTAUTH_URL}/api/spotify/callback`;
+  const redirectUri = `${publicAppUrl()}/api/spotify/callback`;
   if (!clientId) {
     return NextResponse.redirect(new URL("/settings?spotify=error", request.url));
   }
