@@ -42,9 +42,14 @@ export HOST_PORT="${HOST_PORT}"
 export POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT}"
 
 ENV_FILE="${SCRIPT_DIR}/.env"
+ENV_EXAMPLE="${SCRIPT_DIR}/.env.example"
 if [[ ! -f "${ENV_FILE}" ]]; then
-  echo "Missing .env file. Copy .env.example to .env and configure it."
-  exit 1
+  if [[ ! -f "${ENV_EXAMPLE}" ]]; then
+    echo "Missing .env and .env.example files." >&2
+    exit 1
+  fi
+  cp "${ENV_EXAMPLE}" "${ENV_FILE}"
+  echo "Created .env from .env.example — edit secrets before production use."
 fi
 
 COMPOSE_CMD=(docker compose -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}" --env-file "${ENV_FILE}")
