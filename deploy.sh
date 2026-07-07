@@ -41,6 +41,11 @@ done
 export HOST_PORT="${HOST_PORT}"
 export WS_HOST_PORT="$((HOST_PORT + 1))"
 export POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT}"
+export_compose_runtime_env
+
+if [[ "${PROJECT_NAME}" == *"-staging" ]]; then
+  export NEXTAUTH_URL="http://127.0.0.1:${HOST_PORT}"
+fi
 
 ENV_FILE="${SCRIPT_DIR}/.env"
 ENV_EXAMPLE="${SCRIPT_DIR}/.env.example"
@@ -60,10 +65,15 @@ if [[ -n "${POSTGRES_HOST_PORT}" ]]; then
   COMPOSE_CMD+=(--profile debug)
 fi
 
+UP_ARGS=()
+if [[ -n "${DEPLOY_IMAGE_TAG:-}" ]]; then
+  UP_ARGS+=(--no-build)
+fi
+
 if [[ "${DETACH}" -eq 1 ]]; then
-  "${COMPOSE_CMD[@]}" up -d
+  "${COMPOSE_CMD[@]}" up -d "${UP_ARGS[@]}"
 else
-  "${COMPOSE_CMD[@]}" up
+  "${COMPOSE_CMD[@]}" up "${UP_ARGS[@]}"
 fi
 
 echo "Deployed at http://localhost:${HOST_PORT}"

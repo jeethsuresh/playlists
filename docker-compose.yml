@@ -29,6 +29,7 @@ services:
       - internal
 
   app:
+    image: ${APP_IMAGE:-playlists-app:latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -54,6 +55,7 @@ services:
       - internal
 
   ws:
+    image: ${WS_IMAGE:-playlists-ws:latest}
     build:
       context: .
       dockerfile: Dockerfile.ws

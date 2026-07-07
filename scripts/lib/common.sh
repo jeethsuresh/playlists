@@ -37,3 +37,11 @@ parse_common_args() {
 
   export PROJECT_NAME COMPOSE_FILE HOST_PORT SKIP_INSTALL
 }
+
+# Shared image names so build, staging, and production use the same tags.
+export_compose_runtime_env() {
+  export COMPOSE_PROJECT_NAME="${PROJECT_NAME}"
+  local tag="${DEPLOY_IMAGE_TAG:-latest}"
+  export APP_IMAGE="playlists-app:${tag}"
+  export WS_IMAGE="playlists-ws:${tag}"
+}

@@ -28,7 +28,9 @@ if [[ "${SKIP_INSTALL:-0}" -ne 1 ]]; then
   npm install
 fi
 
-echo "Building Docker images (project: ${PROJECT_NAME})..."
+export_compose_runtime_env
+
+echo "Building Docker images (project: ${PROJECT_NAME}, tag: ${DEPLOY_IMAGE_TAG:-latest})..."
 docker compose -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}" build
 
 echo "Build complete."
