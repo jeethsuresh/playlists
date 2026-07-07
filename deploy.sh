@@ -39,6 +39,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 export HOST_PORT="${HOST_PORT}"
+export WS_HOST_PORT="$((HOST_PORT + 1))"
 export POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT}"
 
 ENV_FILE="${SCRIPT_DIR}/.env"
