@@ -5,12 +5,12 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "node --import tsx --test packages/shared/src/**/*.test.ts",
+    "test:watch": "node --import tsx --test --watch packages/shared/src/**/*.test.ts",
     "build": "npm run build --workspace=packages/web"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "tsx": "^4.23.0",
+    "typescript": "^5.8.3"
   }
 }

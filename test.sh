@@ -9,7 +9,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Run unit tests.
+Run unit tests (Node.js built-in test runner).
 
 Options:
   --watch                 Run tests in watch mode
@@ -34,10 +34,12 @@ done
 
 cd "${SCRIPT_DIR}"
 
+TEST_GLOB="packages/shared/src/**/*.test.ts"
+
 if [[ "${WATCH}" -eq 1 ]]; then
-  npm run test:watch
+  node --import tsx --test --watch ${TEST_GLOB}
 else
-  npm run test
+  node --import tsx --test ${TEST_GLOB}
 fi
 
 echo "Tests passed."
