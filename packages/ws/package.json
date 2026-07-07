@@ -1,0 +1,23 @@
+{
+  "name": "@playlists/ws",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts"
+  },
+  "dependencies": {
+    "@playlists/db": "^0.1.0",
+    "@playlists/shared": "^0.1.0",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.3",
+    "postgres": "^3.4.9",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.0",
+    "typescript": "^5.8.3"
+  }
+}
