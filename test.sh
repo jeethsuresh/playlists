@@ -14,6 +14,7 @@ Run unit tests (Node.js built-in test runner).
 Options:
   --watch                 Run tests in watch mode
   --coverage              Run with coverage (not yet configured)
+  --skip-install          Skip npm install
   --project-name NAME     Docker Compose project name (unused, for consistency)
   --compose-file FILE     Compose file path (unused, for consistency)
   --host-port PORT        Host port (unused, for consistency)
@@ -34,12 +35,22 @@ done
 
 cd "${SCRIPT_DIR}"
 
-TEST_GLOB="packages/shared/src/**/*.test.ts"
+if [[ "${SKIP_INSTALL:-0}" -ne 1 ]]; then
+  echo "Installing dependencies..."
+  npm install --include=dev
+fi
+
+shopt -s nullglob globstar
+TEST_FILES=(packages/shared/src/**/*.test.ts)
+if ((${#TEST_FILES[@]} == 0)); then
+  echo "No test files found under packages/shared/src" >&2
+  exit 1
+fi
 
 if [[ "${WATCH}" -eq 1 ]]; then
-  node --import tsx --test --watch ${TEST_GLOB}
+  node --import tsx --test --watch "${TEST_FILES[@]}"
 else
-  node --import tsx --test ${TEST_GLOB}
+  node --import tsx --test "${TEST_FILES[@]}"
 fi
 
 echo "Tests passed."
