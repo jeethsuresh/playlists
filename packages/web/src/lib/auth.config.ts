@@ -14,7 +14,9 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
 
       if (!isLoggedIn && !isAuthPage && !isPublicInvite) {
-        return false;
+        const login = new URL("/login", request.nextUrl);
+        login.searchParams.set("callbackUrl", request.nextUrl.toString());
+        return Response.redirect(login);
       }
       if (isLoggedIn && isAuthPage) {
         return Response.redirect(new URL("/", request.nextUrl));
