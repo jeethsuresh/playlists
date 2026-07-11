@@ -9,9 +9,25 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const urlError = searchParams.get("error");
+  const urlCode = searchParams.get("code");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (urlCode === "pending_approval") {
+      return "Account pending admin approval";
+    }
+    if (urlCode === "rejected") {
+      return "Account has been rejected";
+    }
+    if (urlError === "CredentialsSignin" || urlCode === "credentials") {
+      return "Invalid email or password";
+    }
+    if (urlError === "Configuration") {
+      return "This account cannot sign in yet";
+    }
+    return urlError;
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,7 +38,15 @@ export default function LoginForm() {
       redirect: false,
     });
     if (result?.error) {
-      setError(result.error);
+      const message =
+        result.error === "CredentialsSignin" || result.code === "credentials"
+          ? "Invalid email or password"
+          : result.code === "pending_approval"
+            ? "Account pending admin approval"
+            : result.code === "rejected"
+              ? "Account has been rejected"
+              : result.error;
+      setError(message);
       return;
     }
     router.push(callbackUrl);

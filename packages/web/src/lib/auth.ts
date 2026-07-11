@@ -1,3 +1,4 @@
+import { CredentialsSignin } from "next-auth";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -33,6 +34,14 @@ declare module "@auth/core/jwt" {
   }
 }
 
+class PendingApprovalError extends CredentialsSignin {
+  code = "pending_approval";
+}
+
+class RejectedAccountError extends CredentialsSignin {
+  code = "rejected";
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
@@ -59,11 +68,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         if (!canLogin(user.status)) {
-          throw new Error(
-            user.status === "pending"
-              ? "Account pending admin approval"
-              : "Account has been rejected",
-          );
+          if (user.status === "pending") {
+            throw new PendingApprovalError();
+          }
+          throw new RejectedAccountError();
         }
 
         const valid = await bcrypt.compare(password, user.passwordHash);

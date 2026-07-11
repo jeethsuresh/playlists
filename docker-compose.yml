@@ -36,8 +36,11 @@ services:
     environment:
       DATABASE_URL: postgres://playlists:${POSTGRES_PASSWORD:-playlists_dev}@postgres:5432/playlists
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3456}
-      NEXTAUTH_PUBLIC_URL: ${NEXTAUTH_PUBLIC_URL:-}
+      AUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_PUBLIC_URL:-${NEXTAUTH_URL:-http://localhost:3456}}
+      AUTH_URL: ${NEXTAUTH_PUBLIC_URL:-${NEXTAUTH_URL:-http://localhost:3456}}
+      NEXTAUTH_PUBLIC_URL: ${NEXTAUTH_PUBLIC_URL:-${NEXTAUTH_URL:-http://localhost:3456}}
+      AUTH_TRUST_HOST: "true"
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}

@@ -43,12 +43,6 @@ export WS_HOST_PORT="$((HOST_PORT + 1))"
 export POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT}"
 export_compose_runtime_env
 
-# Auth middleware uses NEXTAUTH_URL as the request base; Forge health checks probe 127.0.0.1.
-if [[ -z "${NEXTAUTH_PUBLIC_URL:-}" && -n "${NEXTAUTH_URL:-}" ]]; then
-  export NEXTAUTH_PUBLIC_URL="${NEXTAUTH_URL}"
-fi
-export NEXTAUTH_URL="http://127.0.0.1:${HOST_PORT}"
-
 ENV_FILE="${SCRIPT_DIR}/.env"
 ENV_EXAMPLE="${SCRIPT_DIR}/.env.example"
 if [[ ! -f "${ENV_FILE}" ]]; then
@@ -60,7 +54,20 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Created .env from .env.example — edit secrets before production use."
 fi
 
-COMPOSE_CMD=(docker compose -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}" --env-file "${ENV_FILE}")
+load_env_defaults "${ENV_FILE}"
+
+if [[ -n "${NEXTAUTH_URL:-}" ]]; then
+  NEXTAUTH_URL="$(normalize_auth_url "${NEXTAUTH_URL}")"
+  export NEXTAUTH_URL
+fi
+if [[ -n "${NEXTAUTH_PUBLIC_URL:-}" ]]; then
+  NEXTAUTH_PUBLIC_URL="$(normalize_auth_url "${NEXTAUTH_PUBLIC_URL}")"
+  export NEXTAUTH_PUBLIC_URL
+elif [[ -n "${NEXTAUTH_URL:-}" ]]; then
+  export NEXTAUTH_PUBLIC_URL="${NEXTAUTH_URL}"
+fi
+
+COMPOSE_CMD=(docker compose -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}")
 
 if [[ -n "${POSTGRES_HOST_PORT}" ]]; then
   export COMPOSE_PROFILES=debug

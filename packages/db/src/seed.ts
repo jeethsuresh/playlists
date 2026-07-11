@@ -13,6 +13,14 @@ export async function seedAdmin(
   });
 
   if (existing) {
+    const matches = await bcrypt.compare(adminPassword, existing.passwordHash);
+    if (!matches) {
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      await db
+        .update(users)
+        .set({ passwordHash })
+        .where(eq(users.email, adminEmail.toLowerCase()));
+    }
     return;
   }
 

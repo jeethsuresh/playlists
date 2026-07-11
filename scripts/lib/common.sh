@@ -46,3 +46,48 @@ export_compose_runtime_env() {
   # Forge only tags app images (next/stable/rollback); ws always comes from the latest build.
   export WS_IMAGE="playlists-ws:latest"
 }
+
+# Use https for public hostnames so session cookies work behind TLS terminators.
+normalize_auth_url() {
+  local url="${1:-}"
+  [[ -n "${url}" ]] || return 0
+
+  if [[ "${url}" =~ ^http://(127\.0\.0\.1|localhost)(:[0-9]+)?(/|$) ]]; then
+    printf '%s' "${url}"
+    return 0
+  fi
+
+  if [[ "${url}" =~ ^http:// ]]; then
+    printf 'https://%s' "${url#http://}"
+    return 0
+  fi
+
+  printf '%s' "${url}"
+}
+
+# Load .env defaults without overriding variables already set (e.g. by Forge).
+load_env_defaults() {
+  local env_file="$1"
+  [[ -f "${env_file}" ]] || return 0
+
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    line="${line%%#*}"
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -n "${line}" ]] || continue
+    [[ "${line}" == export* ]] && line="${line#export }"
+    [[ "${line}" == *"="* ]] || continue
+
+    local key="${line%%=*}"
+    local value="${line#*=}"
+    key="${key%"${key##*[![:space:]]}"}"
+    key="${key#"${key%%[![:space:]]*}"}"
+
+    if [[ ! "${key}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      continue
+    fi
+    if [[ -z "${!key:-}" ]]; then
+      export "${key}=${value}"
+    fi
+  done < "${env_file}"
+}
